@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cpp2 build support for Visual C++ projects, part 3 of 3: the Cpp2Compile item
+     type for .cpp2 and .h2 files, and its property page (Properties > Cpp2). -->
+<ProjectSchemaDefinitions xmlns="http://schemas.microsoft.com/build/2009/properties" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <Rule Name="Cpp2Compile" PageTemplate="tool" DisplayName="Cpp2" Order="200">
+    <Rule.DataSource>
+      <DataSource Persistence="ProjectFile" ItemType="Cpp2Compile" />
+    </Rule.DataSource>
+    <Rule.Categories>
+      <Category Name="General" DisplayName="General" />
+      <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine" />
+    </Rule.Categories>
+    <BoolProperty Name="PureCpp2" Category="General" DisplayName="Pure Cpp2"
+      Description="Passes -pure-cpp2: Cpp2 only, with import std. Needs the C++ standard set to latest and Build ISO C++23 Standard Library Modules on." />
+    <StringProperty Name="AdditionalOptions" Category="Command Line" DisplayName="Additional Options"
+      Description="Further cppfront options, such as -fno-exceptions." />
+  </Rule>
+  <ItemType Name="Cpp2Compile" DisplayName="Cpp2 source" />
+  <FileExtension Name="*.cpp2" ContentType="Cpp2Compile" />
+  <FileExtension Name="*.h2" ContentType="Cpp2Compile" />
+  <ContentType Name="Cpp2Compile" DisplayName="Cpp2 source" ItemType="Cpp2Compile" />
+</ProjectSchemaDefinitions>

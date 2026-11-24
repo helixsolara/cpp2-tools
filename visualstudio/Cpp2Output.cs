@@ -59,7 +59,7 @@ public sealed class Cpp2Output : IDisposable
     }
 
     /// <summary>Lists diagnostics in the Error List, and shows it when there are errors.</summary>
-    public void Report(IReadOnlyList<CppfrontDiagnostic> diagnostics)
+    public void Report(IReadOnlyList<Diagnostic> diagnostics)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         foreach (var diagnostic in diagnostics)

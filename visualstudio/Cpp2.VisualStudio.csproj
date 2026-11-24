@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- The Cpp2 Visual Studio extension: the shared TextMate grammar and language
      configuration from ..\grammar, registered by Cpp2.pkgdef, and a package with
-     the Transpile Cpp2 File and Go To Generated Code commands. Build with MSBuild from a Developer prompt:
+     the Transpile Cpp2 File, Go To Generated Code and Build and Run Cpp2 File
+     commands, and the MSBuild rules for .cpp2 files in .vcxproj projects with a
+     cppfront built from ..\external\cppfront. Build with MSBuild from a Developer prompt:
        msbuild visualstudio\Cpp2.VisualStudio.csproj /restore /p:Configuration=Release -->
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
@@ -22,6 +24,9 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+    <CppfrontSourceDir>$(MSBuildThisFileDirectory)..\external\cppfront\</CppfrontSourceDir>
+    <CppfrontBuildDir>$(MSBuildThisFileDirectory)obj\cppfront\</CppfrontBuildDir>
+    <VcVarsPath>$(MSBuildExtensionsPath)\..\VC\Auxiliary\Build\vcvars64.bat</VcVarsPath>
     <DebugType>portable</DebugType>
     <!-- The package's own pkgdef is generated from its attributes; Cpp2.pkgdef
          registers the grammar beside it -->
@@ -37,15 +42,20 @@
     <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BuildAndRunCommand.cs" />
     <Compile Include="Cpp2Documents.cs" />
     <Compile Include="Cpp2Options.cs" />
     <Compile Include="Cpp2Output.cs" />
     <Compile Include="Cpp2Package.cs" />
     <Compile Include="Cppfront.cs" />
+    <Compile Include="Diagnostic.cs" />
     <Compile Include="GeneratedCode.cs" />
+    <Compile Include="MSBuildRules.cs" />
     <Compile Include="OpenGeneratedCommand.cs" />
     <Compile Include="Polyfills.cs" />
+    <Compile Include="SingleFileBuild.cs" />
     <Compile Include="SourcesFile.cs" />
+    <Compile Include="ToolRunner.cs" />
     <Compile Include="TranspileCommand.cs" />
     <VSCTCompile Include="Cpp2Commands.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
@@ -76,6 +86,28 @@
       <IncludeInVSIX>true</IncludeInVSIX>
       <VSIXSubPath>Grammars</VSIXSubPath>
     </Content>
+    <!-- The MSBuild rules, with the bundled cppfront in a cppfront folder beside
+         them, where Cpp2.props looks for it -->
+    <Content Include="..\msbuild\Cpp2.props;..\msbuild\Cpp2.targets;..\msbuild\Cpp2.xml">
+      <Link>MSBuild\%(Filename)%(Extension)</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>MSBuild</VSIXSubPath>
+    </Content>
+    <Content Include="$(CppfrontBuildDir)cppfront.exe">
+      <Link>MSBuild\cppfront\cppfront.exe</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>MSBuild\cppfront</VSIXSubPath>
+    </Content>
+    <Content Include="$(CppfrontSourceDir)include\*.h">
+      <Link>MSBuild\cppfront\include\%(Filename)%(Extension)</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>MSBuild\cppfront\include</VSIXSubPath>
+    </Content>
+    <Content Include="$(CppfrontSourceDir)LICENSE">
+      <Link>MSBuild\cppfront\LICENSE</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <VSIXSubPath>MSBuild\cppfront</VSIXSubPath>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime">
@@ -86,6 +118,21 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <!-- Builds the bundled cppfront from the fork in ..\external\cppfront, with the
+       x64 compiler of the Visual Studio running this build. It is rebuilt only
+       when cppfront's sources change -->
+  <ItemGroup>
+    <CppfrontSources Include="$(CppfrontSourceDir)source\*.cpp;$(CppfrontSourceDir)source\*.h;$(CppfrontSourceDir)include\*.h" />
+  </ItemGroup>
+  <Target Name="BuildCppfront" BeforeTargets="PrepareForBuild" Inputs="@(CppfrontSources)" Outputs="$(CppfrontBuildDir)cppfront.exe">
+    <Error Condition="!Exists('$(CppfrontSourceDir)source\cppfront.cpp')"
+           Text="The cppfront sources are missing from $(CppfrontSourceDir); run git submodule update --init" />
+    <Error Condition="!Exists('$(VcVarsPath)')"
+           Text="$(VcVarsPath) is missing; building the bundled cppfront needs Visual Studio's C++ workload" />
+    <MakeDir Directories="$(CppfrontBuildDir)" />
+    <Exec Command="call &quot;$(VcVarsPath)&quot; &gt;nul &amp;&amp; cl /nologo /std:c++latest /EHsc /O2 /MT /bigobj &quot;$(CppfrontSourceDir)source\cppfront.cpp&quot; /Fe:&quot;$(CppfrontBuildDir)cppfront.exe&quot; /Fo:&quot;$(CppfrontBuildDir)cppfront.obj&quot;"
+          WorkingDirectory="$(CppfrontBuildDir)" />
+  </Target>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

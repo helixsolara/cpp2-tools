@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The Cpp2 commands, Transpile Cpp2 File and Go To Generated Code, on the
-     Build menu and the editor's context menu. They start hidden and show only
-     for .cpp2 and .h2 files (their UpdateStatus methods). -->
+<!-- The Cpp2 commands, Transpile Cpp2 File, Go To Generated Code and Build and
+     Run Cpp2 File, on the Build menu and the editor's context menu. They start
+     hidden and show only for Cpp2 files (their UpdateStatus methods). -->
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <Extern href="stdidcmd.h" />
   <Extern href="vsshlids.h" />
@@ -39,6 +39,17 @@
           <LocCanonicalName>Cpp2.GoToGeneratedCode</LocCanonicalName>
         </Strings>
       </Button>
+      <Button guid="guidCpp2CommandSet" id="BuildAndRun" priority="0x0300" type="Button">
+        <Parent guid="guidCpp2CommandSet" id="BuildMenuGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>Build and Run Cpp2 File</ButtonText>
+          <CanonicalName>Cpp2.BuildAndRunFile</CanonicalName>
+          <LocCanonicalName>Cpp2.BuildAndRunFile</LocCanonicalName>
+        </Strings>
+      </Button>
     </Buttons>
   </Commands>
 
@@ -47,6 +58,9 @@
       <Parent guid="guidCpp2CommandSet" id="EditorContextGroup" />
     </CommandPlacement>
     <CommandPlacement guid="guidCpp2CommandSet" id="OpenGenerated" priority="0x0200">
+      <Parent guid="guidCpp2CommandSet" id="EditorContextGroup" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCpp2CommandSet" id="BuildAndRun" priority="0x0300">
       <Parent guid="guidCpp2CommandSet" id="EditorContextGroup" />
     </CommandPlacement>
   </CommandPlacements>
@@ -58,6 +72,7 @@
       <IDSymbol name="EditorContextGroup" value="0x1021" />
       <IDSymbol name="TranspileFile" value="0x0100" />
       <IDSymbol name="OpenGenerated" value="0x0101" />
+      <IDSymbol name="BuildAndRun" value="0x0102" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

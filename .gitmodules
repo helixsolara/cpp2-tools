@@ -1,0 +1,4 @@
+[submodule "external/cppfront"]
+	path = external/cppfront
+	url = https://github.com/helixsolara/cppfront.git
+	branch = ena/modules

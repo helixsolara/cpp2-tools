@@ -8,7 +8,9 @@ Tools for writing [Cpp2](https://github.com/hsutter/cppfront) (cppfront) code:
   from one TextMate grammar (`grammar/`). VS Code builds through CMake Tools.
 - In Visual Studio, **Build > Transpile Cpp2 File**, which runs cppfront on the
   current file as its CMake build does and opens the result, with cppfront's
-  errors in the Error List. More build support is in progress.
+  errors in the Error List, and **Build > Go To Generated Code**, which opens
+  the build's generated code at the current line. Building without CMake is in
+  progress.
 
 ## The CMake module
 

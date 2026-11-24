@@ -23,14 +23,19 @@ claude-rules repo.
   the language configuration under `TextMate\LanguageConfiguration\GrammarMapping`;
   the csproj links both from `grammar/` into the VSIX's `Grammars` folder.
   `Cpp2Package` (an `AsyncPackage` that loads in the background) adds
-  Transpile Cpp2 File (`TranspileCommand`, `Cpp2Commands.vsct`) and the options
-  page (`Cpp2Options`). `SourcesFile` reads the CMake module's
+  Transpile Cpp2 File (`TranspileCommand`), Go To Generated Code
+  (`OpenGeneratedCommand`), both in `Cpp2Commands.vsct`, and the options page
+  (`Cpp2Options`); `Cpp2Documents` holds what both commands ask of the active
+  document. `GeneratedCode` maps a source line to a generated one through the
+  `#line` directives, preferring the last match, since cppfront declares
+  functions before defining them. The generated file is made read-only in the
+  editor (`BSF_USER_READONLY`), not on disk, since the build rewrites it. `SourcesFile` reads the CMake module's
   `cpp2_sources.json`, `Cppfront` runs cppfront and parses its diagnostics, and
   `Cpp2Output` writes the Output pane and the Error List.
   `tests/Test-ExtensionLogic.ps1` loads the built DLL with `Assembly.LoadFrom`
   (not `Add-Type`, which would load the package types and need Visual Studio)
-  and tests `SourcesFile` and `Cppfront`. Next: open the build's generated code,
-  and build without CMake.
+  and tests `SourcesFile`, `Cppfront` and `GeneratedCode`. Next: building without
+  CMake.
 
 ## Visual Studio notes
 

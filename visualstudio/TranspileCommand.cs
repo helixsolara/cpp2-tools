@@ -61,7 +61,7 @@ public sealed class TranspileCommand
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         var command = (OleMenuCommand)sender;
-        command.Visible = command.Enabled = IsCpp2(ActiveDocumentPath());
+        command.Visible = command.Enabled = Cpp2Documents.IsCpp2(Cpp2Documents.ActivePath(_dte));
     }
 
     void Execute(object sender, EventArgs e)
@@ -75,7 +75,7 @@ public sealed class TranspileCommand
         await _package.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
         var document = _dte.ActiveDocument;
         var source = document?.FullName;
-        if (document == null || !IsCpp2(source))
+        if (document == null || !Cpp2Documents.IsCpp2(source))
         {
             return;
         }
@@ -178,24 +178,6 @@ public sealed class TranspileCommand
         var hash = sha.ComputeHash(Encoding.UTF8.GetBytes(text));
         return string.Concat(hash.Take(6).Select(b => b.ToString("x2")));
     }
-
-    string? ActiveDocumentPath()
-    {
-        ThreadHelper.ThrowIfNotOnUIThread();
-        try
-        {
-            return _dte.ActiveDocument?.FullName;
-        }
-        catch (ArgumentException)
-        {
-            // Some windows, such as the start page, throw rather than give no document
-            return null;
-        }
-    }
-
-    static bool IsCpp2(string? path) =>
-        path != null
-        && (path.EndsWith(".cpp2", StringComparison.OrdinalIgnoreCase) || path.EndsWith(".h2", StringComparison.OrdinalIgnoreCase));
 
     sealed record TranspilePlan(string Cppfront, System.Collections.Generic.IReadOnlyList<string> Options, string Output, string Origin);
 }

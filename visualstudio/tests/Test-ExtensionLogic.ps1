@@ -169,3 +169,6 @@ if ($script:failures) {
     exit 1
 }
 Write-Output 'All passed'
+# Explicit, since $LASTEXITCODE may still hold a failure a test expected, and a
+# caller such as GitHub's pwsh step would exit with it
+exit 0

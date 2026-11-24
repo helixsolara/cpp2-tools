@@ -1,0 +1,6 @@
+import greeting;
+
+main: () =
+{
+    std::cout << greeting() << "\n";
+}

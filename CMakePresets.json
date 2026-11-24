@@ -1,0 +1,16 @@
+{
+    "version": 6,
+    "configurePresets": [
+        {
+            "name": "x64-debug",
+            "displayName": "x64 Debug (Ninja, MSVC)",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/.out/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_CXX_COMPILER": "cl"
+            },
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+        }
+    ]
+}

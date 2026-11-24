@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- The Cpp2 Visual Studio extension: the shared TextMate grammar and language
      configuration from ..\grammar, registered by Cpp2.pkgdef, and a package with
-     the Transpile Cpp2 File command. Build with MSBuild from a Developer prompt:
+     the Transpile Cpp2 File and Go To Generated Code commands. Build with MSBuild from a Developer prompt:
        msbuild visualstudio\Cpp2.VisualStudio.csproj /restore /p:Configuration=Release -->
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
@@ -37,10 +37,13 @@
     <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cpp2Documents.cs" />
     <Compile Include="Cpp2Options.cs" />
     <Compile Include="Cpp2Output.cs" />
     <Compile Include="Cpp2Package.cs" />
     <Compile Include="Cppfront.cs" />
+    <Compile Include="GeneratedCode.cs" />
+    <Compile Include="OpenGeneratedCommand.cs" />
     <Compile Include="Polyfills.cs" />
     <Compile Include="SourcesFile.cs" />
     <Compile Include="TranspileCommand.cs" />

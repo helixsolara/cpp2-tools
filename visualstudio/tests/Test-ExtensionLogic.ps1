@@ -1,6 +1,6 @@
 # Tests the Visual Studio extension's logic that doesn't need Visual Studio:
 # finding a file in a build's cpp2_sources.json, parsing cppfront's diagnostics,
-# and running cppfront. It loads the built extension assembly, and uses the
+# running cppfront, and mapping source lines to generated ones. It loads the built extension assembly, and uses the
 # cpp2-tools build (configure, build and test it first, see README.md).
 #
 #   powershell -NoProfile -ExecutionPolicy Bypass -File visualstudio\tests\Test-ExtensionLogic.ps1
@@ -71,9 +71,33 @@ function Test-Run {
     Assert-True ($passed.Succeeded -and (Test-Path -LiteralPath $goodOutput)) 'Transpiles a good file to the output asked for'
 }
 
+function Test-LineMapping {
+    # As cppfront lays it out: a declaration of f from line 4, then its definition
+    $generated = [string[]]@(
+        '#include "cpp2util.h"',        # 1
+        '#line 4 "a.cpp2"',             # 2
+        'auto f() -> int;',             # 3: from 4
+        '',                             # 4: from 5
+        '#line 4 "a.cpp2"',             # 5
+        'auto f() -> int {',            # 6: from 4
+        '    return 42;',               # 7: from 5
+        '}'                             # 8: from 6
+    )
+    Assert-True ([Cpp2.VisualStudio.GeneratedCode]::FindLine($generated, 4) -eq 6) 'Maps a line to its definition, not its declaration'
+    Assert-True ([Cpp2.VisualStudio.GeneratedCode]::FindLine($generated, 5) -eq 7) 'Counts lines after a #line directive'
+    Assert-True ([Cpp2.VisualStudio.GeneratedCode]::FindLine($generated, 9) -eq 8) 'Falls back to the nearest earlier line'
+    Assert-True ([Cpp2.VisualStudio.GeneratedCode]::FindLine($generated, 2) -eq 1) 'Falls back to the first line before any code'
+
+    # And on real cppfront output: main is defined from line 1 of good.cpp2
+    $real = [IO.File]::ReadAllLines((Join-Path $WorkDir 'out\good.cpp'))
+    $line = [Cpp2.VisualStudio.GeneratedCode]::FindLine($real, 1)
+    Assert-True ($real[$line - 1] -match 'auto main\(\) -> int') 'Finds main in real cppfront output'
+}
+
 $cppfront = Test-SourcesFile
 Test-Diagnostics
 Test-Run -Cppfront $cppfront
+Test-LineMapping
 
 if ($script:failures) {
     Write-Output "$script:failures failed"

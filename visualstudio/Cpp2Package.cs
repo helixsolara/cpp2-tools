@@ -7,7 +7,8 @@ using Task = System.Threading.Tasks.Task;
 namespace Cpp2.VisualStudio;
 
 /// <summary>
-/// The Cpp2 package: the Transpile Cpp2 File command and its options. The
+/// The Cpp2 package: the Transpile Cpp2 File and Go To Generated Code commands
+/// and the options. The
 /// grammar is registered by Cpp2.pkgdef and needs no code. The package loads in
 /// the background once the shell is up, so the command can hide itself for
 /// files that aren't Cpp2.
@@ -29,6 +30,7 @@ public sealed class Cpp2Package : AsyncPackage
         var options = (Cpp2Options)GetDialogPage(typeof(Cpp2Options));
         _output = await Cpp2Output.CreateAsync(this, cancellationToken);
         await TranspileCommand.RegisterAsync(this, options, _output, cancellationToken);
+        await OpenGeneratedCommand.RegisterAsync(this, _output, cancellationToken);
     }
 
     protected override void Dispose(bool disposing)

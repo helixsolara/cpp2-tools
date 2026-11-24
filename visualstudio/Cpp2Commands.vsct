@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The Cpp2 commands: Transpile Cpp2 File, on the Build menu and the editor's
-     context menu. It starts hidden and shows only for .cpp2 and .h2 files
-     (TranspileCommand.UpdateStatus). -->
+<!-- The Cpp2 commands, Transpile Cpp2 File and Go To Generated Code, on the
+     Build menu and the editor's context menu. They start hidden and show only
+     for .cpp2 and .h2 files (their UpdateStatus methods). -->
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <Extern href="stdidcmd.h" />
   <Extern href="vsshlids.h" />
@@ -28,11 +28,25 @@
           <LocCanonicalName>Cpp2.TranspileFile</LocCanonicalName>
         </Strings>
       </Button>
+      <Button guid="guidCpp2CommandSet" id="OpenGenerated" priority="0x0200" type="Button">
+        <Parent guid="guidCpp2CommandSet" id="BuildMenuGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>Go To Generated Code</ButtonText>
+          <CanonicalName>Cpp2.GoToGeneratedCode</CanonicalName>
+          <LocCanonicalName>Cpp2.GoToGeneratedCode</LocCanonicalName>
+        </Strings>
+      </Button>
     </Buttons>
   </Commands>
 
   <CommandPlacements>
     <CommandPlacement guid="guidCpp2CommandSet" id="TranspileFile" priority="0x0100">
+      <Parent guid="guidCpp2CommandSet" id="EditorContextGroup" />
+    </CommandPlacement>
+    <CommandPlacement guid="guidCpp2CommandSet" id="OpenGenerated" priority="0x0200">
       <Parent guid="guidCpp2CommandSet" id="EditorContextGroup" />
     </CommandPlacement>
   </CommandPlacements>
@@ -43,6 +57,7 @@
       <IDSymbol name="BuildMenuGroup" value="0x1020" />
       <IDSymbol name="EditorContextGroup" value="0x1021" />
       <IDSymbol name="TranspileFile" value="0x0100" />
+      <IDSymbol name="OpenGenerated" value="0x0101" />
     </GuidSymbol>
   </Symbols>
 </CommandTable>

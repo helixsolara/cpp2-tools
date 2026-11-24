@@ -14,6 +14,13 @@ A VSIX for Visual Studio 2022 17.14 and later (up to 19.0):
   (the cppfront path, or cppfront on PATH, and its options). The result goes to
   `%TEMP%\cpp2-tools\transpiled\` and opens read-only; cppfront's output goes to
   the **Cpp2** pane of the Output window, and its errors to the Error List.
+- **Build > Go To Generated Code** (also on the context menu, for the same
+  files). It opens the file the CMake build generated from the current file,
+  as `cpp2_sources.json` records it, read-only in the editor, at the code
+  generated from the caret's line (found through cppfront's `#line`
+  directives, preferring a function's definition to its declaration). The
+  status bar says when the generated code is older than the file; build to
+  update it.
 
 Build it from a Developer prompt (restoring the VS SDK packages from NuGet):
 
@@ -27,7 +34,8 @@ Opening the project in Visual Studio and pressing F5 runs it in the
 experimental instance instead.
 
 `tests\Test-ExtensionLogic.ps1` tests the logic that needs no Visual Studio
-(finding the file in a sources file, parsing diagnostics, running cppfront)
+(finding the file in a sources file, parsing diagnostics, running cppfront,
+mapping source lines to generated ones)
 against the cpp2-tools build:
 
     powershell -NoProfile -ExecutionPolicy Bypass -File visualstudio\tests\Test-ExtensionLogic.ps1

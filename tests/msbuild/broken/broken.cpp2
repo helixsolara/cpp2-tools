@@ -1,0 +1,7 @@
+//  Deliberately broken: line 6 has an empty statement, which cppfront rejects
+//  with an error naming this file, line 6, column 14
+
+main: () =
+{
+    x: int = ;
+}

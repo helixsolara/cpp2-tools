@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cpp2 build support for Visual C++ projects (.vcxproj), part 1 of 3: defaults.
+     Add Cpp2.props, Cpp2.targets and Cpp2.xml to a project through Build
+     Customizations (it imports this file in ExtensionSettings and Cpp2.targets
+     in ExtensionTargets), then add .cpp2 and .h2 files to the project.
+
+     By default cppfront and its include folder come from a cppfront folder
+     beside these files, as the Visual Studio extension lays them out. Set
+     Cpp2CppfrontPath and Cpp2IncludeDir in the project to use another. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Cpp2CppfrontPath Condition="'$(Cpp2CppfrontPath)' == ''">$(MSBuildThisFileDirectory)cppfront\cppfront.exe</Cpp2CppfrontPath>
+    <Cpp2IncludeDir Condition="'$(Cpp2IncludeDir)' == ''">$(MSBuildThisFileDirectory)cppfront\include</Cpp2IncludeDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Cpp2Compile>
+      <!-- Passes -pure-cpp2: Cpp2 only, with import std, which needs the C++
+           standard set to latest and Build ISO C++23 Standard Library Modules on -->
+      <PureCpp2>false</PureCpp2>
+      <AdditionalOptions></AdditionalOptions>
+    </Cpp2Compile>
+  </ItemDefinitionGroup>
+</Project>

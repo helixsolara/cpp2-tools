@@ -102,12 +102,10 @@ public sealed class TranspileCommand
         {
             return new TranspilePlan(build.Cppfront, build.Options, output, "the settings of the CMake build that lists it");
         }
-        var cppfront = string.IsNullOrWhiteSpace(_options.CppfrontPath) ? "cppfront.exe" : _options.CppfrontPath.Trim();
-        var options = _options.Arguments.Split([' ', '\t'], StringSplitOptions.RemoveEmptyEntries);
-        return new TranspilePlan(cppfront, options, output, "Tools > Options > Cpp2, since no CMake build lists it");
+        return new TranspilePlan(_options.Cppfront(), _options.CppfrontOptions(), output, "Tools > Options > Cpp2, since no CMake build lists it");
     }
 
-    static async Task<CppfrontResult?> RunAsync(TranspilePlan plan, string source, CancellationToken cancellationToken)
+    static async Task<ToolResult?> RunAsync(TranspilePlan plan, string source, CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(plan.Output)!);
         if (File.Exists(plan.Output))
@@ -130,7 +128,7 @@ public sealed class TranspileCommand
         }
     }
 
-    void Report(TranspilePlan plan, CppfrontResult? result)
+    void Report(TranspilePlan plan, ToolResult? result)
     {
         ThreadHelper.ThrowIfNotOnUIThread();
         _output.WriteLine($"Using {plan.Origin}.");
@@ -143,7 +141,7 @@ public sealed class TranspileCommand
 
         _output.WriteLine(result.CommandLine);
         _output.WriteLine(result.Output.TrimEnd());
-        _output.Report(CppfrontDiagnostic.Parse(result.Output, Path.GetDirectoryName(plan.Output)!));
+        _output.Report(Diagnostic.Parse(result.Output, Path.GetDirectoryName(plan.Output)!));
         if (!result.Succeeded)
         {
             _output.WriteLine($"cppfront failed with exit code {result.ExitCode}.");

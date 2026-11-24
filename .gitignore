@@ -4,3 +4,5 @@ node_modules/
 *.vsix
 bin/
 obj/
+cpp2_post_build.sh
+*.pdb

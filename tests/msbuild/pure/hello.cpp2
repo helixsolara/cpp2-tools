@@ -1,0 +1,5 @@
+//  Pure Cpp2: -pure-cpp2 makes cppfront import std
+main: () =
+{
+    std::cout << "Hello from pure Cpp2\n";
+}

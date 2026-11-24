@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Cpp2 build support for Visual C++ projects, part 2 of 3: the build steps.
+     Before compiling, each Cpp2Compile item (.cpp2 or .h2) is transpiled by
+     cppfront into $(Cpp2OutputDir), keeping its folder relative to the project
+     (a file outside the project's folder goes to the top of it). Then:
+
+       - a .cpp2 that declares a module interface ("export module m;" or
+         "export module m:part;") compiles as a module interface unit;
+       - a .cpp2 that declares an internal partition ("module m:part;")
+         compiles as one;
+       - any other .cpp2 compiles as ordinary C++;
+       - a .h2 becomes a .h beside the generated code, where a .cpp2's
+         #include "x.h2" finds it.
+
+     cppfront only runs for files changed since their last transpile, or when
+     cppfront itself changed. Its errors name the .cpp2 file, so they reach the
+     Error List; compiler errors point at .cpp2 lines through cppfront's #line
+     directives. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Cpp2.xml" />
+    <AvailableItemName Include="Cpp2Compile">
+      <Targets>Cpp2Transpile</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <Cpp2OutputDir Condition="'$(Cpp2OutputDir)' == ''">$([System.IO.Path]::Combine('$(ProjectDir)', '$(IntDir)'))cpp2\</Cpp2OutputDir>
+    <!-- Runs in the build's source generation step, before anything compiles -->
+    <BuildGenerateSourcesTargets>$(BuildGenerateSourcesTargets);Cpp2Transpile</BuildGenerateSourcesTargets>
+  </PropertyGroup>
+
+  <!-- Works out each source's output file, its kind and its cppfront options -->
+  <UsingTask TaskName="Cpp2ClassifySources" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Sources ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <ProjectDir ParameterType="System.String" Required="true" />
+      <OutputDir ParameterType="System.String" Required="true" />
+      <Classified ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+      <Generated ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text.RegularExpressions" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var interfaceUnit = new Regex(@"^[ \t]*export[ \t]+module[ \t]", RegexOptions.Multiline);
+        var internalPartition = new Regex(@"^[ \t]*module[ \t]+[^;:\s]+[ \t]*:", RegexOptions.Multiline);
+        var projectDir = Path.GetFullPath(ProjectDir);
+        var classified = new List<ITaskItem>();
+        var generated = new List<ITaskItem>();
+        foreach (var source in Sources)
+        {
+            var fullPath = source.GetMetadata("FullPath");
+            var relative = fullPath.StartsWith(projectDir, StringComparison.OrdinalIgnoreCase)
+                ? fullPath.Substring(projectDir.Length)
+                : Path.GetFileName(fullPath);
+            var stem = Path.Combine(Path.GetDirectoryName(relative), Path.GetFileNameWithoutExtension(relative));
+
+            string kind;
+            string extension;
+            if (fullPath.EndsWith(".h2", StringComparison.OrdinalIgnoreCase))
+            {
+                kind = "Header";
+                extension = ".h";
+            }
+            else
+            {
+                var text = File.ReadAllText(fullPath);
+                kind = interfaceUnit.IsMatch(text) ? "Interface" : internalPartition.IsMatch(text) ? "InternalPartition" : "Source";
+                extension = kind == "Source" ? ".cpp" : ".ixx";
+            }
+            var output = Path.Combine(OutputDir, stem + extension);
+
+            var options = string.Equals(source.GetMetadata("PureCpp2"), "true", StringComparison.OrdinalIgnoreCase) ? "-pure-cpp2 " : "";
+            options += source.GetMetadata("AdditionalOptions");
+
+            var item = new TaskItem(fullPath);
+            item.SetMetadata("Cpp2Output", output);
+            item.SetMetadata("OutputFolder", Path.GetDirectoryName(output));
+            item.SetMetadata("CppfrontOptions", options.Trim());
+            classified.Add(item);
+
+            var generatedItem = new TaskItem(output);
+            generatedItem.SetMetadata("Cpp2Kind", kind);
+            generated.Add(generatedItem);
+        }
+        Classified = classified.ToArray();
+        Generated = generated.ToArray();
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="_Cpp2Classify" Condition="'@(Cpp2Compile)' != ''">
+    <Cpp2ClassifySources Sources="@(Cpp2Compile)" ProjectDir="$(ProjectDir)" OutputDir="$(Cpp2OutputDir)">
+      <Output TaskParameter="Classified" ItemName="_Cpp2Source" />
+      <Output TaskParameter="Generated" ItemName="_Cpp2Generated" />
+    </Cpp2ClassifySources>
+  </Target>
+
+  <!-- Batched per source, so only changed files are transpiled -->
+  <Target Name="_Cpp2RunCppfront"
+          DependsOnTargets="_Cpp2Classify"
+          Condition="'@(Cpp2Compile)' != '' and '$(DesignTimeBuild)' != 'true'"
+          Inputs="@(_Cpp2Source);$(Cpp2CppfrontPath)"
+          Outputs="%(_Cpp2Source.Cpp2Output)">
+    <Error Condition="!Exists('$(Cpp2CppfrontPath)')"
+           Text="cppfront wasn't found at $(Cpp2CppfrontPath). Set Cpp2CppfrontPath in the project, or keep a cppfront folder beside Cpp2.props." />
+    <MakeDir Directories="%(_Cpp2Source.OutputFolder)" />
+    <!-- cppfront leaves an empty cpp2_post_build.sh in its working folder, so it runs in the output folder -->
+    <Exec Command="&quot;$(Cpp2CppfrontPath)&quot; %(_Cpp2Source.CppfrontOptions) &quot;%(_Cpp2Source.FullPath)&quot; -output &quot;%(_Cpp2Source.Cpp2Output)&quot;"
+          WorkingDirectory="%(_Cpp2Source.OutputFolder)" />
+  </Target>
+
+  <Target Name="Cpp2Transpile" DependsOnTargets="_Cpp2RunCppfront" Condition="'@(Cpp2Compile)' != ''">
+    <ItemGroup>
+      <ClCompile Include="@(_Cpp2Generated)" Condition="'%(_Cpp2Generated.Cpp2Kind)' == 'Interface'">
+        <CompileAs>CompileAsCppModule</CompileAs>
+      </ClCompile>
+      <ClCompile Include="@(_Cpp2Generated)" Condition="'%(_Cpp2Generated.Cpp2Kind)' == 'InternalPartition'">
+        <CompileAs>CompileAsCppModuleInternalPartition</CompileAs>
+      </ClCompile>
+      <ClCompile Include="@(_Cpp2Generated)" Condition="'%(_Cpp2Generated.Cpp2Kind)' == 'Source'" />
+    </ItemGroup>
+    <ItemGroup>
+      <!-- Generated code includes cpp2util.h, and may import modules from other units -->
+      <ClCompile Condition="'%(ClCompile.Cpp2Kind)' != ''">
+        <AdditionalIncludeDirectories>$(Cpp2IncludeDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+        <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
+      </ClCompile>
+      <!-- So Clean removes the generated files -->
+      <FileWrites Include="@(_Cpp2Generated)" />
+    </ItemGroup>
+  </Target>
+</Project>

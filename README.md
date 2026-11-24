@@ -9,8 +9,11 @@ Tools for writing [Cpp2](https://github.com/hsutter/cppfront) (cppfront) code:
 - In Visual Studio, **Build > Transpile Cpp2 File**, which runs cppfront on the
   current file as its CMake build does and opens the result, with cppfront's
   errors in the Error List, and **Build > Go To Generated Code**, which opens
-  the build's generated code at the current line. Building without CMake is in
-  progress.
+  the build's generated code at the current line, and **Build > Build and Run
+  Cpp2 File**, which builds a single file without CMake and runs it.
+- MSBuild rules (`msbuild/`) for `.cpp2` and `.h2` files in ordinary Visual C++
+  projects (`.vcxproj`), added through Build Customizations; the Visual Studio
+  extension ships them with a bundled cppfront (see `visualstudio/README.md`).
 
 ## The CMake module
 

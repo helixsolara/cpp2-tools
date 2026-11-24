@@ -1,0 +1,29 @@
+{
+    "name": "cpp2",
+    "displayName": "Cpp2",
+    "description": "Syntax highlighting for Cpp2 (cppfront) .cpp2 and .h2 files.",
+    "version": "0.1.0",
+    "publisher": "helixsolara",
+    "license": "MIT",
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": ["Programming Languages"],
+    "contributes": {
+        "languages": [
+            {
+                "id": "cpp2",
+                "aliases": ["Cpp2", "cpp2"],
+                "extensions": [".cpp2", ".h2"],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "cpp2",
+                "scopeName": "source.cpp2",
+                "path": "./syntaxes/cpp2.tmLanguage.json"
+            }
+        ]
+    }
+}

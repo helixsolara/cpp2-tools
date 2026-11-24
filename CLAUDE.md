@@ -9,9 +9,25 @@ claude-rules repo.
 - `cmake/Cpp2.cmake`: the CMake module (`include (Cpp2)`), defining
   `cpp2::cppfront`, `cpp2::cpp2util` and `cpp2_target_sources`.
 - `tests/cmake`: programs built with the module; ctest checks their output.
-- Planned: `grammar/` (one TextMate grammar for both editors), `vscode/`
-  (highlighting only; VS Code builds through CMake Tools) and `visualstudio/`
-  (a VSIX: highlighting first, then build support).
+- `grammar/`: the TextMate grammar both editors use, `cpp2.tmLanguage.json`,
+  written by `generate.py` (edit the script, not the JSON, then run
+  `python grammar/generate.py`), and `language-configuration.json`.
+- `vscode/`: the VS Code extension, highlighting only (VS Code builds through
+  CMake Tools). It has no code, so it needs no Node; `install.ps1` assembles it
+  with the shared grammar in `%USERPROFILE%\.vscode\extensions`, where VS Code
+  picks it up after a reload.
+- Planned: `visualstudio/`, a VSIX: highlighting first, then build support
+  (cppfront errors in the Error List, transpiling the current file, opening the
+  generated code, and building without CMake).
+
+## Grammar notes
+
+- A declaration's kind comes from what follows `name:` (a lookahead): `namespace`,
+  `type` (after template parameters, metafunctions and `final`), `concept`, `(`
+  for functions, anything else a variable. Names after `.` or `::` aren't
+  declarations, so `handlers.paint = :() = ...` stays a member access.
+- String interpolation `(expr)$` is recognized only when a lookahead finds the
+  closing `)$`, with up to two levels of nested parentheses.
 
 ## CMake module notes
 

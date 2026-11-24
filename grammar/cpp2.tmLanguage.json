@@ -1,0 +1,410 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Cpp2",
+  "scopeName": "source.cpp2",
+  "fileTypes": [
+    "cpp2",
+    "h2"
+  ],
+  "patterns": [
+    {
+      "include": "#statements"
+    }
+  ],
+  "repository": {
+    "statements": {
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "include": "#preprocessor"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#numbers"
+        },
+        {
+          "include": "#characters"
+        },
+        {
+          "include": "#metafunctions"
+        },
+        {
+          "include": "#declarations"
+        },
+        {
+          "include": "#keywords"
+        },
+        {
+          "include": "#types"
+        },
+        {
+          "include": "#scopes"
+        },
+        {
+          "include": "#calls"
+        },
+        {
+          "include": "#operators"
+        },
+        {
+          "include": "#punctuation"
+        }
+      ]
+    },
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.cpp2",
+          "begin": "//",
+          "end": "$",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.comment.cpp2"
+            }
+          }
+        },
+        {
+          "name": "comment.block.cpp2",
+          "begin": "/\\*",
+          "end": "\\*/",
+          "captures": {
+            "0": {
+              "name": "punctuation.definition.comment.cpp2"
+            }
+          }
+        }
+      ]
+    },
+    "preprocessor": {
+      "name": "meta.preprocessor.cpp2",
+      "begin": "^\\s*(#)\\s*([A-Za-z_][A-Za-z0-9_]*)\\b",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.directive.cpp2"
+        },
+        "2": {
+          "name": "keyword.control.directive.cpp2"
+        }
+      },
+      "end": "(?<!\\\\)$",
+      "patterns": [
+        {
+          "include": "#comments"
+        },
+        {
+          "name": "string.quoted.other.lt-gt.include.cpp2",
+          "match": "<[^>\\s]+>"
+        },
+        {
+          "include": "#strings"
+        },
+        {
+          "include": "#numbers"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.raw.cpp2",
+          "begin": "(\\$?(?:u8|u|U|L)?R)\\\"([^(\\s\\\\]{0,16})\\(",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.cpp2"
+            },
+            "1": {
+              "name": "storage.type.string.cpp2"
+            }
+          },
+          "end": "\\)\\2\\\"",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.cpp2"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#interpolation"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.cpp2",
+          "begin": "((?:u8|u|U|L)?)\\\"",
+          "beginCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.begin.cpp2"
+            },
+            "1": {
+              "name": "storage.type.string.cpp2"
+            }
+          },
+          "end": "\\\"([A-Za-z_][A-Za-z0-9_]*)?",
+          "endCaptures": {
+            "0": {
+              "name": "punctuation.definition.string.end.cpp2"
+            },
+            "1": {
+              "name": "keyword.other.suffix.cpp2"
+            }
+          },
+          "patterns": [
+            {
+              "include": "#escapes"
+            },
+            {
+              "include": "#interpolation"
+            }
+          ]
+        }
+      ]
+    },
+    "escapes": {
+      "name": "constant.character.escape.cpp2",
+      "match": "\\\\(?:[abfnrtv'\\\"?\\\\0]|x[0-9a-fA-F]+|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8}|[0-7]{1,3}|N\\{[^}]*\\})"
+    },
+    "interpolation": {
+      "name": "meta.interpolation.cpp2",
+      "begin": "\\((?=(?:[^()\\\"]|\\((?:[^()]|\\([^()]*\\))*\\))*\\)\\$)",
+      "beginCaptures": {
+        "0": {
+          "name": "punctuation.section.interpolation.begin.cpp2"
+        }
+      },
+      "end": "\\)\\$",
+      "endCaptures": {
+        "0": {
+          "name": "punctuation.section.interpolation.end.cpp2"
+        }
+      },
+      "contentName": "source.cpp2.embedded",
+      "patterns": [
+        {
+          "include": "#statements"
+        }
+      ]
+    },
+    "characters": {
+      "name": "string.quoted.single.cpp2",
+      "match": "(?:u8|u|U|L)?'(?:\\\\.|[^'\\\\])+'",
+      "captures": {
+        "0": {
+          "patterns": [
+            {
+              "include": "#escapes"
+            }
+          ]
+        }
+      }
+    },
+    "numbers": {
+      "name": "constant.numeric.cpp2",
+      "match": "(?<![\\w.])(?:0[xX][0-9a-fA-F](?:'?[0-9a-fA-F])*|0[bB][01](?:'?[01])*|\\d(?:'?\\d)*(?:\\.\\d(?:'?\\d)*)?(?:[eE][+-]?\\d+)?|\\.\\d+(?:[eE][+-]?\\d+)?)(?:[A-Za-z_]\\w*)?"
+    },
+    "metafunctions": {
+      "match": "(@)([A-Za-z_][A-Za-z0-9_]*)",
+      "captures": {
+        "1": {
+          "name": "punctuation.definition.decorator.cpp2"
+        },
+        "2": {
+          "name": "entity.name.function.decorator.cpp2"
+        }
+      }
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "comment": "name: namespace",
+          "match": "(?<![\\w.:])((?!(?:if|else|for|do|while|next|break|continue|return|inspect|is|as|in|inout|out|copy|move|forward|in_ref|forward_ref|type|namespace|this|that|true|false|nullptr)\\b)[A-Za-z_][A-Za-z0-9_]*)\\s*(:)(?!:)(?=\\s*namespace\\b)",
+          "captures": {
+            "1": {
+              "name": "entity.name.namespace.cpp2"
+            },
+            "2": {
+              "name": "punctuation.separator.declaration.cpp2"
+            }
+          }
+        },
+        {
+          "comment": "name: <T: type> @meta final type",
+          "match": "(?<![\\w.:])((?!(?:if|else|for|do|while|next|break|continue|return|inspect|is|as|in|inout|out|copy|move|forward|in_ref|forward_ref|type|namespace|this|that|true|false|nullptr)\\b)[A-Za-z_][A-Za-z0-9_]*)\\s*(:)(?!:)(?=\\s*(?:<(?:[^<>]|<[^<>]*>)*>\\s*)?(?:@[A-Za-z_][A-Za-z0-9_]*(?:<(?:[^<>]|<[^<>]*>)*>)?\\s*)*(?:final\\s+)?type\\b)",
+          "captures": {
+            "1": {
+              "name": "entity.name.type.cpp2"
+            },
+            "2": {
+              "name": "punctuation.separator.declaration.cpp2"
+            }
+          }
+        },
+        {
+          "comment": "name: <T> concept",
+          "match": "(?<![\\w.:])((?!(?:if|else|for|do|while|next|break|continue|return|inspect|is|as|in|inout|out|copy|move|forward|in_ref|forward_ref|type|namespace|this|that|true|false|nullptr)\\b)[A-Za-z_][A-Za-z0-9_]*)\\s*(:)(?!:)(?=\\s*(?:<(?:[^<>]|<[^<>]*>)*>\\s*)?concept\\b)",
+          "captures": {
+            "1": {
+              "name": "entity.name.type.concept.cpp2"
+            },
+            "2": {
+              "name": "punctuation.separator.declaration.cpp2"
+            }
+          }
+        },
+        {
+          "comment": "operator=: (...) and the other operator functions",
+          "match": "\\b(operator)\\s*(==|!=|<=>|<=|>=|<<=|>>=|<<|>>|\\+\\+|--|->|\\(\\)|\\[\\]|[-+*/%^&|~!=<>]=?)\\s*(:)(?!:)",
+          "captures": {
+            "1": {
+              "name": "storage.type.declaration.cpp2"
+            },
+            "2": {
+              "name": "entity.name.function.operator.cpp2"
+            },
+            "3": {
+              "name": "punctuation.separator.declaration.cpp2"
+            }
+          }
+        },
+        {
+          "comment": "name: <T> (parameters) -> result",
+          "match": "(?<![\\w.:])((?!(?:if|else|for|do|while|next|break|continue|return|inspect|is|as|in|inout|out|copy|move|forward|in_ref|forward_ref|type|namespace|this|that|true|false|nullptr)\\b)[A-Za-z_][A-Za-z0-9_]*)\\s*(:)(?!:)(?=\\s*(?:<(?:[^<>]|<[^<>]*>)*>\\s*)?\\()",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.cpp2"
+            },
+            "2": {
+              "name": "punctuation.separator.declaration.cpp2"
+            }
+          }
+        },
+        {
+          "comment": "name: type = value, name := value",
+          "match": "(?<![\\w.:])((?!(?:if|else|for|do|while|next|break|continue|return|inspect|is|as|in|inout|out|copy|move|forward|in_ref|forward_ref|type|namespace|this|that|true|false|nullptr)\\b)[A-Za-z_][A-Za-z0-9_]*)\\s*(:)(?!:)",
+          "captures": {
+            "1": {
+              "name": "variable.other.declaration.cpp2"
+            },
+            "2": {
+              "name": "punctuation.separator.declaration.cpp2"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.cpp2",
+          "match": "\\b(?:if|else|for|do|while|next|break|continue|return|inspect|try|catch|throw|co_await|co_yield|co_return)\\b"
+        },
+        {
+          "name": "keyword.operator.word.cpp2",
+          "match": "\\b(?:is|as|new|sizeof|alignof|typeid|decltype|type_of|unchecked_cast|unsafe_cast)\\b"
+        },
+        {
+          "name": "keyword.other.contract.cpp2",
+          "match": "\\b(?:pre|post|assert)\\b(?=\\s*[<(])"
+        },
+        {
+          "name": "storage.type.declaration.cpp2",
+          "match": "\\b(?:type|namespace|concept|operator|using)\\b"
+        },
+        {
+          "name": "keyword.other.module.cpp2",
+          "match": "\\b(?:import|export|module)\\b"
+        },
+        {
+          "name": "storage.modifier.parameter.cpp2",
+          "match": "\\b(?:in|inout|out|copy|move|forward|in_ref|forward_ref)\\b"
+        },
+        {
+          "name": "storage.modifier.cpp2",
+          "match": "\\b(?:virtual|override|final|implicit|public|protected|private|throws|const|static|constexpr|consteval|inline)\\b"
+        },
+        {
+          "name": "variable.language.cpp2",
+          "match": "\\b(?:this|that)\\b|(?<!\\w)_(?!\\w)"
+        },
+        {
+          "name": "constant.language.cpp2",
+          "match": "\\b(?:true|false|nullptr)\\b"
+        }
+      ]
+    },
+    "types": {
+      "name": "storage.type.built-in.cpp2",
+      "match": "\\b(?:void|bool|char|int|float|double|auto|short|long|i8|i16|i32|i64|u8|u16|u32|u64|f32|f64|_schar|_uchar|ushort|uint|ulong|longlong|ulonglong|longdouble|char8_t|char16_t|char32_t|wchar_t)\\b"
+    },
+    "scopes": {
+      "match": "\\b([A-Za-z_][A-Za-z0-9_]*)\\s*(::)",
+      "captures": {
+        "1": {
+          "name": "entity.name.scope-resolution.cpp2"
+        },
+        "2": {
+          "name": "punctuation.separator.scope-resolution.cpp2"
+        }
+      }
+    },
+    "calls": {
+      "match": "(?<!\\w)((?!(?:if|else|for|do|while|next|break|continue|return|inspect|is|as|in|inout|out|copy|move|forward|in_ref|forward_ref|type|namespace|this|that|true|false|nullptr)\\b)[A-Za-z_][A-Za-z0-9_]*)\\s*(?=(?:<(?:[^<>]|<[^<>]*>)*>)?\\s*\\()",
+      "captures": {
+        "1": {
+          "name": "entity.name.function.call.cpp2"
+        }
+      }
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.member.cpp2",
+          "match": "\\.\\.(?![.<=])|\\.(?!\\.)|->"
+        },
+        {
+          "name": "keyword.operator.range.cpp2",
+          "match": "\\.\\.\\.|\\.\\.[<=]"
+        },
+        {
+          "name": "keyword.operator.comparison.cpp2",
+          "match": "<=>|==|!=|<=|>="
+        },
+        {
+          "name": "keyword.operator.assignment.cpp2",
+          "match": ":=|(?:<<|>>|[-+*/%&|^])?="
+        },
+        {
+          "name": "keyword.operator.logical.cpp2",
+          "match": "&&|\\|\\||!"
+        },
+        {
+          "name": "keyword.operator.capture.cpp2",
+          "match": "\\$"
+        },
+        {
+          "name": "keyword.operator.cpp2",
+          "match": "\\+\\+|--|<<|>>|[-+*/%&|^~<>]"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.terminator.statement.cpp2",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.separator.delimiter.cpp2",
+          "match": ","
+        },
+        {
+          "name": "punctuation.separator.colon.cpp2",
+          "match": ":"
+        }
+      ]
+    }
+  }
+}

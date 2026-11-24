@@ -55,3 +55,9 @@ ctest --test-dir .out/build/x64-debug
 
 `CPP2_TEST_MODULES` needs a cppfront that can write modules, such as
 https://github.com/helixsolara/cppfront (branch `ena/modules`).
+
+## License
+
+Apache License 2.0; see [LICENSE](LICENSE). The cppfront that the Visual Studio
+extension bundles, built from `external/cppfront`, is under cppfront's own
+license, Apache 2.0 with LLVM Exceptions, which the extension ships beside it.

@@ -20,3 +20,16 @@ if (CPP2_TEST_MODULES)
     add_test (NAME Modules COMMAND cpp2_modules)
     set_property (TEST Modules PROPERTY PASS_REGULAR_EXPRESSION "Hello from a Cpp2 module")
 endif ()
+
+# The sources file lists every transpiled file above (2 plain, 2 more with modules)
+if (CPP2_TEST_MODULES)
+    set (CPP2_EXPECTED_SOURCES 4)
+else ()
+    set (CPP2_EXPECTED_SOURCES 2)
+endif ()
+add_test (NAME SourcesFile
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSOURCES_FILE=${CMAKE_BINARY_DIR}/cpp2_sources$<$<BOOL:$<CONFIG>>:-$<CONFIG>>.json"
+        -DEXPECTED_COUNT=${CPP2_EXPECTED_SOURCES}
+        -P "${CMAKE_CURRENT_SOURCE_DIR}/check_sources_file.cmake")
+set_property (TEST SourcesFile PROPERTY PASS_REGULAR_EXPRESSION "Sources file checked")

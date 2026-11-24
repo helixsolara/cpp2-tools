@@ -16,9 +16,23 @@ claude-rules repo.
   CMake Tools). It has no code, so it needs no Node; `install.ps1` assembles it
   with the shared grammar in `%USERPROFILE%\.vscode\extensions`, where VS Code
   picks it up after a reload.
-- Planned: `visualstudio/`, a VSIX: highlighting first, then build support
-  (cppfront errors in the Error List, transpiling the current file, opening the
-  generated code, and building without CMake).
+- `visualstudio/`: the Visual Studio extension, a VSIX built with MSBuild and
+  Microsoft.VSSDK.BuildTools (an old-style csproj, net472). It has no code yet:
+  `Cpp2.pkgdef` registers the shared grammar under `TextMate\Repositories` and
+  the language configuration under `TextMate\LanguageConfiguration\GrammarMapping`,
+  and the csproj links both files from `grammar/` into the VSIX's `Grammars`
+  folder. Next: build support (cppfront errors in the Error List, transpiling
+  the current file, opening the generated code, building without CMake).
+
+## Visual Studio notes
+
+- cppfront reports errors as `file.cpp2(line,col): error: ...`, the format the
+  Error List reads, but with the file name only, even when given a full path,
+  so the Error List can't open the file from a CMake build (cppfront runs in the
+  output folder). Fixing that is the first build-support step.
+- A debug cppfront's CRT assertions open a dialog. When testing broken input,
+  build it with a forced-include header that calls `_CrtSetReportMode(_CRT_ASSERT,
+  _CRTDBG_MODE_FILE)` so they go to stderr instead.
 
 ## Grammar notes
 

@@ -4,8 +4,9 @@ Tools for writing [Cpp2](https://github.com/hsutter/cppfront) (cppfront) code:
 
 - `cmake/Cpp2.cmake`: a CMake module that builds cppfront and transpiles a
   target's `.cpp2` and `.h2` files, including C++20 module units.
-- Syntax highlighting for VS Code and Visual Studio, and build support in Visual
-  Studio (in progress).
+- Syntax highlighting for VS Code (`vscode/`) and Visual Studio (`visualstudio/`),
+  from one TextMate grammar (`grammar/`). Build support in Visual Studio is in
+  progress; VS Code builds through CMake Tools.
 
 ## The CMake module
 

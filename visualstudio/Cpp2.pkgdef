@@ -1,0 +1,8 @@
+; Registers the Cpp2 TextMate grammar, which the editor matches to .cpp2 and .h2
+; files through the grammar's fileTypes, and its language configuration (brackets,
+; comments, auto-closing pairs)
+[$RootKey$\TextMate\Repositories]
+"Cpp2"="$PackageFolder$\Grammars"
+
+[$RootKey$\TextMate\LanguageConfiguration\GrammarMapping]
+"source.cpp2"="$PackageFolder$\Grammars\language-configuration.json"

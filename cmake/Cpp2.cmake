@@ -80,6 +80,55 @@ if (NOT TARGET cpp2::cppfront)
     _cpp2_define_targets ()
 endif ()
 
+# The build's sources file -----------------------------------------------------
+#
+# Configuring writes <build dir>/cpp2_sources.json (cpp2_sources-<config>.json for
+# a configuration's build), which tells editor tools how this build transpiles
+# each Cpp2 file:
+#
+#   { "version": 1, "cppfront": "<path>",
+#     "sources": [ { "target": "...", "source": "...", "output": "...",
+#                    "options": ["-pure-cpp2", ...] }, ... ] }
+
+# Sets OUT_VAR to TEXT quoted as a JSON string
+function (_cpp2_json_string TEXT OUT_VAR)
+    string (REPLACE "\\" "\\\\" TEXT "${TEXT}")
+    string (REPLACE "\"" "\\\"" TEXT "${TEXT}")
+    set (${OUT_VAR} "\"${TEXT}\"" PARENT_SCOPE)
+endfunction ()
+
+# Adds one transpiled file to the sources file, which is written once the top
+# folder has been configured
+function (_cpp2_record_source TARGET_NAME INPUT OUTPUT FLAGS)
+    _cpp2_json_string ("${TARGET_NAME}" TARGET_JSON)
+    _cpp2_json_string ("${INPUT}" INPUT_JSON)
+    _cpp2_json_string ("${OUTPUT}" OUTPUT_JSON)
+    set (OPTIONS_JSON "")
+    foreach (FLAG IN LISTS FLAGS)
+        _cpp2_json_string ("${FLAG}" FLAG_JSON)
+        if (OPTIONS_JSON)
+            string (APPEND OPTIONS_JSON ", ")
+        endif ()
+        string (APPEND OPTIONS_JSON "${FLAG_JSON}")
+    endforeach ()
+    set (ENTRY "    { \"target\": ${TARGET_JSON}, \"source\": ${INPUT_JSON}, \"output\": ${OUTPUT_JSON}, \"options\": [${OPTIONS_JSON}] }")
+
+    get_property (ENTRIES GLOBAL PROPERTY _CPP2_SOURCES_JSON)
+    if (ENTRIES)
+        set_property (GLOBAL APPEND_STRING PROPERTY _CPP2_SOURCES_JSON ",\n${ENTRY}")
+    else ()
+        set_property (GLOBAL PROPERTY _CPP2_SOURCES_JSON "${ENTRY}")
+        cmake_language (DEFER DIRECTORY "${CMAKE_SOURCE_DIR}" CALL _cpp2_write_sources_file)
+    endif ()
+endfunction ()
+
+function (_cpp2_write_sources_file)
+    get_property (ENTRIES GLOBAL PROPERTY _CPP2_SOURCES_JSON)
+    file (GENERATE
+        OUTPUT "${CMAKE_BINARY_DIR}/cpp2_sources$<$<BOOL:$<CONFIG>>:-$<CONFIG>>.json"
+        CONTENT "{\n  \"version\": 1,\n  \"cppfront\": \"$<TARGET_FILE:cpp2::cppfront>\",\n  \"sources\": [\n${ENTRIES}\n  ]\n}\n")
+endfunction ()
+
 # cpp2_target_sources (<target> [PURE_CPP2] [DIRECTORY <dir>] [SOURCES <file>...]
 #                      [OPTIONS <cppfront option>...])
 #
@@ -164,6 +213,7 @@ function (cpp2_target_sources TARGET_NAME)
             DEPENDS "${INPUT}" "$<TARGET_FILE:cpp2::cppfront>"
             COMMENT "Transpiling ${RELATIVE_INPUT}"
             VERBATIM)
+        _cpp2_record_source ("${TARGET_NAME}" "${INPUT}" "${OUTPUT}" "${FLAGS}")
     endforeach ()
 
     if (OTHER_UNITS)

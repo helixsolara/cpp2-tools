@@ -16,13 +16,21 @@ claude-rules repo.
   CMake Tools). It has no code, so it needs no Node; `install.ps1` assembles it
   with the shared grammar in `%USERPROFILE%\.vscode\extensions`, where VS Code
   picks it up after a reload.
-- `visualstudio/`: the Visual Studio extension, a VSIX built with MSBuild and
-  Microsoft.VSSDK.BuildTools (an old-style csproj, net472). It has no code yet:
+- `visualstudio/`: the Visual Studio extension, a VSIX built with MSBuild,
+  Microsoft.VSSDK.BuildTools and Microsoft.VisualStudio.SDK 17.14 (an old-style
+  csproj, net472, C# latest with nullable on and warnings as errors).
   `Cpp2.pkgdef` registers the shared grammar under `TextMate\Repositories` and
-  the language configuration under `TextMate\LanguageConfiguration\GrammarMapping`,
-  and the csproj links both files from `grammar/` into the VSIX's `Grammars`
-  folder. Next: build support (cppfront errors in the Error List, transpiling
-  the current file, opening the generated code, building without CMake).
+  the language configuration under `TextMate\LanguageConfiguration\GrammarMapping`;
+  the csproj links both from `grammar/` into the VSIX's `Grammars` folder.
+  `Cpp2Package` (an `AsyncPackage` that loads in the background) adds
+  Transpile Cpp2 File (`TranspileCommand`, `Cpp2Commands.vsct`) and the options
+  page (`Cpp2Options`). `SourcesFile` reads the CMake module's
+  `cpp2_sources.json`, `Cppfront` runs cppfront and parses its diagnostics, and
+  `Cpp2Output` writes the Output pane and the Error List.
+  `tests/Test-ExtensionLogic.ps1` loads the built DLL with `Assembly.LoadFrom`
+  (not `Add-Type`, which would load the package types and need Visual Studio)
+  and tests `SourcesFile` and `Cppfront`. Next: open the build's generated code,
+  and build without CMake.
 
 ## Visual Studio notes
 
@@ -48,6 +56,12 @@ claude-rules repo.
 ## CMake module notes
 
 - Generated files go to `<binary dir>/cpp2/<target>/<path relative to DIRECTORY>`.
+- Configuring writes `<build dir>/cpp2_sources.json` (`cpp2_sources-<config>.json`
+  when a configuration is set) for editor tools: the cppfront path, and each
+  source's target, output and options. Entries collect in a global property;
+  the first one schedules `_cpp2_write_sources_file` with
+  `cmake_language (DEFER DIRECTORY ${CMAKE_SOURCE_DIR})`, which writes the file
+  with `file (GENERATE)` so the cppfront path can be `$<TARGET_FILE:...>`.
 - Module interface units are found by a regex on the file's first module
   declaration at configure time, so each `.cpp2` is a `CMAKE_CONFIGURE_DEPENDS`.
 - cppfront writes an empty `cpp2_post_build.sh` into its working folder, so the

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The Cpp2 Visual Studio extension. For now it has no code: the VSIX carries
-     the shared TextMate grammar and language configuration from ..\grammar and
-     a pkgdef that registers them. Build with MSBuild from a Developer prompt:
+<!-- The Cpp2 Visual Studio extension: the shared TextMate grammar and language
+     configuration from ..\grammar, registered by Cpp2.pkgdef, and a package with
+     the Transpile Cpp2 File command. Build with MSBuild from a Developer prompt:
        msbuild visualstudio\Cpp2.VisualStudio.csproj /restore /p:Configuration=Release -->
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
@@ -18,18 +18,44 @@
     <RootNamespace>Cpp2.VisualStudio</RootNamespace>
     <AssemblyName>Cpp2.VisualStudio</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <!-- No code yet, so no assembly or generated pkgdef in the VSIX -->
-    <GeneratePkgDefFile>false</GeneratePkgDefFile>
-    <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
-    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
-    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <DebugType>portable</DebugType>
+    <!-- The package's own pkgdef is generated from its attributes; Cpp2.pkgdef
+         registers the grammar beside it -->
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <UseCodebase>true</UseCodebase>
+    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
     <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
     <!-- F5 starts the experimental instance, leaving the main one untouched -->
     <StartAction>Program</StartAction>
     <StartProgram>$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Cpp2Options.cs" />
+    <Compile Include="Cpp2Output.cs" />
+    <Compile Include="Cpp2Package.cs" />
+    <Compile Include="Cppfront.cs" />
+    <Compile Include="Polyfills.cs" />
+    <Compile Include="SourcesFile.cs" />
+    <Compile Include="TranspileCommand.cs" />
+    <VSCTCompile Include="Cpp2Commands.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+    </VSCTCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
@@ -49,6 +75,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime">
+      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="18.12.1606">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

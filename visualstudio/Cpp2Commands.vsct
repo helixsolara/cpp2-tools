@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The Cpp2 commands: Transpile Cpp2 File, on the Build menu and the editor's
+     context menu. It starts hidden and shows only for .cpp2 and .h2 files
+     (TranspileCommand.UpdateStatus). -->
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <Extern href="stdidcmd.h" />
+  <Extern href="vsshlids.h" />
+
+  <Commands package="guidCpp2Package">
+    <Groups>
+      <Group guid="guidCpp2CommandSet" id="BuildMenuGroup" priority="0x0300">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_BUILD" />
+      </Group>
+      <Group guid="guidCpp2CommandSet" id="EditorContextGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="guidCpp2CommandSet" id="TranspileFile" priority="0x0100" type="Button">
+        <Parent guid="guidCpp2CommandSet" id="BuildMenuGroup" />
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultDisabled</CommandFlag>
+        <Strings>
+          <ButtonText>Transpile Cpp2 File</ButtonText>
+          <CanonicalName>Cpp2.TranspileFile</CanonicalName>
+          <LocCanonicalName>Cpp2.TranspileFile</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <CommandPlacements>
+    <CommandPlacement guid="guidCpp2CommandSet" id="TranspileFile" priority="0x0100">
+      <Parent guid="guidCpp2CommandSet" id="EditorContextGroup" />
+    </CommandPlacement>
+  </CommandPlacements>
+
+  <Symbols>
+    <GuidSymbol name="guidCpp2Package" value="{52d64e4b-55e2-4f50-9e51-7b9d69829c8c}" />
+    <GuidSymbol name="guidCpp2CommandSet" value="{ee5a82cb-47b1-4c03-a1b1-cc4c6890155e}">
+      <IDSymbol name="BuildMenuGroup" value="0x1020" />
+      <IDSymbol name="EditorContextGroup" value="0x1021" />
+      <IDSymbol name="TranspileFile" value="0x0100" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

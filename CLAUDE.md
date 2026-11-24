@@ -26,10 +26,12 @@ claude-rules repo.
 
 ## Visual Studio notes
 
-- cppfront reports errors as `file.cpp2(line,col): error: ...`, the format the
-  Error List reads, but with the file name only, even when given a full path,
-  so the Error List can't open the file from a CMake build (cppfront runs in the
-  output folder). Fixing that is the first build-support step.
+- cppfront reports errors as `path(line,col): error: ...`, the format the Error
+  List reads. Upstream cppfront prints only the file name, which the Error List
+  can't open from a CMake build (cppfront runs in the output folder); the
+  helixsolara fork (`ena/modules`, d148963) prints the path as given, and the
+  CMake module passes full paths. Compiler errors in generated code already
+  point at `.cpp2` lines through cppfront's `#line` directives.
 - A debug cppfront's CRT assertions open a dialog. When testing broken input,
   build it with a forced-include header that calls `_CrtSetReportMode(_CRT_ASSERT,
   _CRTDBG_MODE_FILE)` so they go to stderr instead.

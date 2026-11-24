@@ -113,6 +113,9 @@ reach `main` through pull requests, per the shared Conventions rule.
 `.github/workflows/ci.yml` runs on every pull request and push to `main`
 (windows-latest): the grammar check, the CMake tests with modules, the VSIX
 build, `Test-ExtensionLogic.ps1` and `Test-Cpp2MSBuild.ps1`, keeping the VSIX
-as an artifact. It started as
+as an artifact. Its `windows` check is required on `main` (branch protection,
+with no review required), so a pull request merges only once CI passes. The
+repository's auto-merge setting is off, so `gh pr merge --auto` doesn't wait:
+it merges at once when it can, and is refused while the check is pending. It started as
 a bare repo on OneDrive (`O:\OneDrive\Git\Helix\cpp2-tools`), no longer used.
 Ena's submodule points at the GitHub URL.

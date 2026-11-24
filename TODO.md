@@ -1,6 +1,7 @@
 # TODO
 
 ## Only the user can do
+- Choose a license for the repo and the extensions (none is set yet).
 - Decide whether to publish the extensions (VS Code Marketplace, Visual Studio
   Marketplace); both need publisher accounts.
 - Install Node.js if the VS Code extension should be packaged as a `.vsix`

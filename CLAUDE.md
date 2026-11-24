@@ -46,5 +46,7 @@ claude-rules repo.
 
 ## Repository
 
-The remote is a bare repo on OneDrive (`O:\OneDrive\Git\Helix\cpp2-tools`), with
-no pull requests, so finished work is pushed straight to `main`.
+Public on GitHub: https://github.com/helixsolara/cpp2-tools (`origin`). Changes
+reach `main` through pull requests, per the shared Conventions rule. It started as
+a bare repo on OneDrive (`O:\OneDrive\Git\Helix\cpp2-tools`), no longer used.
+Ena's submodule points at the GitHub URL.

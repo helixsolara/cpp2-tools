@@ -4,7 +4,6 @@
     "description": "Syntax highlighting for Cpp2 (cppfront) .cpp2 and .h2 files.",
     "version": "0.1.0",
     "publisher": "helixsolara",
-    "license": "MIT",
     "engines": {
         "vscode": "^1.80.0"
     },

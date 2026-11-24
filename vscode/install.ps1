@@ -23,6 +23,7 @@ New-Item -ItemType Directory -Force -Path (Join-Path $target 'syntaxes') | Out-N
 
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'package.json') -Destination $target
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'README.md') -Destination $target
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\LICENSE') -Destination $target
 Copy-Item -LiteralPath (Join-Path $grammarDir 'language-configuration.json') -Destination $target
 Copy-Item -LiteralPath (Join-Path $grammarDir 'cpp2.tmLanguage.json') -Destination (Join-Path $target 'syntaxes')
 

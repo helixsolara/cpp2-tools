@@ -5,6 +5,7 @@
     <DisplayName>Cpp2</DisplayName>
     <Description xml:space="preserve">Syntax highlighting for Cpp2 (cppfront) .cpp2 and .h2 files, commands that transpile a file as its CMake build would, open its generated code, and build and run a single file, and MSBuild support for .cpp2 files in C++ projects.</Description>
     <MoreInfo>https://github.com/helixsolara/cpp2-tools</MoreInfo>
+    <License>LICENSE</License>
     <Tags>cpp2, cppfront, C++</Tags>
   </Metadata>
   <Installation>

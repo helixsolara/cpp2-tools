@@ -5,8 +5,10 @@ Tools for writing [Cpp2](https://github.com/hsutter/cppfront) (cppfront) code:
 - `cmake/Cpp2.cmake`: a CMake module that builds cppfront and transpiles a
   target's `.cpp2` and `.h2` files, including C++20 module units.
 - Syntax highlighting for VS Code (`vscode/`) and Visual Studio (`visualstudio/`),
-  from one TextMate grammar (`grammar/`). Build support in Visual Studio is in
-  progress; VS Code builds through CMake Tools.
+  from one TextMate grammar (`grammar/`). VS Code builds through CMake Tools.
+- In Visual Studio, **Build > Transpile Cpp2 File**, which runs cppfront on the
+  current file as its CMake build does and opens the result, with cppfront's
+  errors in the Error List. More build support is in progress.
 
 ## The CMake module
 
@@ -33,6 +35,10 @@ calling folder by default). A `.cpp2` that starts a module interface or partitio
 (`export module m;`, `module m:part;`) becomes a `.ixx` in the target's
 `CXX_MODULES` file set; other `.cpp2` files become `.cpp` sources; `.h2` files
 become `.h` files beside them. CMake 3.28 or later.
+
+Configuring also writes `cpp2_sources.json` (`cpp2_sources-<config>.json` when a
+configuration is set) into the build folder, telling editor tools which cppfront
+the build uses and how it transpiles each file.
 
 ## Tests
 

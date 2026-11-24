@@ -1,0 +1,66 @@
+# Builds and tests cpp2-tools on every pull request and push to main: the CMake
+# module's tests (with the cppfront fork, modules included), the generated
+# grammar, the Visual Studio extension and its logic tests, and the MSBuild
+# rules. The VSIX is kept as an artifact.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up the MSVC developer environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Check that the grammar matches its generator
+        shell: pwsh
+        run: |
+          python grammar/generate.py
+          if ($LASTEXITCODE) { exit 1 }
+          git diff --exit-code -- grammar
+          if ($LASTEXITCODE) { throw 'grammar/ is out of date: run python grammar/generate.py and commit the result' }
+
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake --preset x64-debug "-DCPP2_CPPFRONT_SOURCE_DIR=$PWD/external/cppfront" -DCPP2_TEST_MODULES=ON
+          if ($LASTEXITCODE) { exit 1 }
+
+      - name: Build
+        run: cmake --build .out/build/x64-debug
+
+      - name: Test the CMake module
+        run: ctest --test-dir .out/build/x64-debug --output-on-failure
+
+      - name: Build the Visual Studio extension
+        run: msbuild visualstudio\Cpp2.VisualStudio.csproj /restore /p:Configuration=Release /v:minimal
+
+      - name: Test the extension's logic
+        shell: pwsh
+        run: ./visualstudio/tests/Test-ExtensionLogic.ps1
+
+      - name: Test the MSBuild rules
+        shell: pwsh
+        run: ./tests/msbuild/Test-Cpp2MSBuild.ps1
+
+      - name: Keep the VSIX
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cpp2.VisualStudio.vsix
+          path: visualstudio/bin/Release/*.vsix
+          if-no-files-found: error

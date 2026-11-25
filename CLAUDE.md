@@ -105,6 +105,12 @@ claude-rules repo.
   `cpp2_cppfront` orders the build for the Visual Studio generator.
 - cppfront writes `#line` directives, so compiler errors already point at `.cpp2`
   lines.
+- `cpp2_cppfront` links with a 16 MB stack. A debug cppfront built with Edit
+  and Continue (`/ZI`), as Visual Studio's CMake projects do, overflowed the
+  default 1 MB on ordinary code (a capturing lambda in a nested call, in a type
+  in two namespaces; `tests/cmake/deep`), since `/ZI` gives every local its own
+  slot in cppfront's very large functions. Optimized builds and `/Zi` were fine.
+  CI configures with `/ZI` so the `DeepNesting` test guards it.
 
 ## Repository
 

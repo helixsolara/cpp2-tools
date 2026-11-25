@@ -1,0 +1,21 @@
+//  Transpiled, not built: a capturing lambda passed through a nested call, in
+//  a function of a type in two nested namespaces. A debug cppfront built with
+//  Edit and Continue (/ZI) overflows the default 1 MB stack on it, so
+//  Cpp2.cmake links cppfront with a larger one
+
+ena: namespace =
+{
+ui: namespace =
+{
+    t: type =
+    {
+        f: () =
+        {
+            add(w(:() =
+            {
+                g(a$);
+            }));
+        }
+    }
+}
+}

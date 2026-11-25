@@ -61,10 +61,16 @@ function (_cpp2_define_targets)
         add_executable (cpp2_cppfront "${SOURCE_DIR}/source/cppfront.cpp")
         set_target_properties (cpp2_cppfront PROPERTIES OUTPUT_NAME cppfront)
         target_compile_features (cpp2_cppfront PRIVATE cxx_std_20)
+        # cppfront recurses through a few very large functions. Unoptimized,
+        # and above all with Edit and Continue (/ZI), which keeps every local
+        # in a slot of its own, those frames overflow the default 1 MB stack
+        # (0xC00000FD) on ordinary code, so give it 16 MB
         if (MSVC)
             target_compile_options (cpp2_cppfront PRIVATE /bigobj /EHsc)
+            target_link_options (cpp2_cppfront PRIVATE /STACK:16777216)
         elseif (MINGW)
             target_compile_options (cpp2_cppfront PRIVATE -Wa,-mbig-obj)
+            target_link_options (cpp2_cppfront PRIVATE -Wl,--stack,16777216)
         endif ()
         add_executable (cpp2::cppfront ALIAS cpp2_cppfront)
         set (INCLUDE_DIR "${SOURCE_DIR}/include")

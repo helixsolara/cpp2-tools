@@ -38,7 +38,9 @@ jobs:
       - name: Configure
         shell: pwsh
         run: |
-          cmake --preset x64-debug "-DCPP2_CPPFRONT_SOURCE_DIR=$PWD/external/cppfront" -DCPP2_TEST_MODULES=ON
+          # Edit and Continue (/ZI), as Visual Studio's CMake projects use, so the
+          # DeepNesting test checks cppfront's stack under its largest frames
+          cmake --preset x64-debug "-DCPP2_CPPFRONT_SOURCE_DIR=$PWD/external/cppfront" -DCPP2_TEST_MODULES=ON -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT=EditAndContinue
           if ($LASTEXITCODE) { exit 1 }
 
       - name: Build

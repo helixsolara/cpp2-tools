@@ -21,6 +21,14 @@ if (CPP2_TEST_MODULES)
     set_property (TEST Modules PROPERTY PASS_REGULAR_EXPRESSION "Hello from a Cpp2 module")
 endif ()
 
+# A debug cppfront built with Edit and Continue (/ZI), as Visual Studio's
+# CMake projects do, overflows the default 1 MB stack on this file; Cpp2.cmake
+# gives it a larger one. CI builds with /ZI so this test guards that
+add_test (NAME DeepNesting
+    COMMAND "$<TARGET_FILE:cpp2::cppfront>" -pure-cpp2
+        "${CMAKE_CURRENT_SOURCE_DIR}/deep/nested_lambda.cpp2"
+        -output "${CMAKE_CURRENT_BINARY_DIR}/nested_lambda.cpp")
+
 # The sources file lists every transpiled file above (2 plain, 2 more with modules)
 if (CPP2_TEST_MODULES)
     set (CPP2_EXPECTED_SOURCES 4)

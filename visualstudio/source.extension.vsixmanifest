@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="Cpp2.VisualStudio.4adfc9ce-db31-4fb7-951a-3fef28806ac7" Version="0.5.2" Language="en-US" Publisher="helixsolara" />
+    <Identity Id="Cpp2.VisualStudio.4adfc9ce-db31-4fb7-951a-3fef28806ac7" Version="0.5.3" Language="en-US" Publisher="helixsolara" />
     <DisplayName>Cpp2</DisplayName>
     <Description xml:space="preserve">Syntax highlighting for Cpp2 (cppfront) .cpp2 and .h2 files, commands that transpile a file as its CMake build would, open its generated code, and build and run a single file, and MSBuild support for .cpp2 files in C++ projects.</Description>
     <MoreInfo>https://github.com/helixsolara/cpp2-tools</MoreInfo>
